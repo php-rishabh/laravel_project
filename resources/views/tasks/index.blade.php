@@ -55,7 +55,7 @@
         @csrf
         <input type="text" name="title" placeholder="Task Title" required>
         <textarea name="description" placeholder="Task Description"></textarea>
-        <button type="submit">Add Task</button>
+        <button type="submit">Add Task </button>
     </form>
 
     <div class="filter-section">
