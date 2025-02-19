@@ -43,16 +43,17 @@ class TaskController extends Controller
         return redirect('/');
     }
 
-    public function reorder(Request $request)
-    {
-        foreach ($request->order as $index => $id) {
-            Task::where('id', $id)->update(['position' => $index]);
-        }
-        return response()->json(['success' => true]);
-    }
-    
     public function edit(Task $task)
     {
         return view('tasks.edit', compact('task'));
+    }
+
+    public function reorder(Request $request)
+    {
+        foreach ($request->order as $task) {
+            Task::where('id', $task['id'])->update(['position' => $task['position']]);
+        }
+    
+        return response()->json(['message' => 'Task order updated successfully.']);
     }
 }

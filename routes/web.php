@@ -11,5 +11,7 @@ Route::post('/tasks', [TaskController::class, 'store']);
 Route::put('/tasks/{task}', [TaskController::class, 'update']);
 Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggleCompletion']);
+// Route::post('/tasks/reorder', [TaskController::class, 'reorder']);
+// Route::get('/tasks/{task}/edit', [TaskController::class, 'edit']);
 Route::post('/tasks/reorder', [TaskController::class, 'reorder']);
-Route::get('/tasks/{task}/edit', [TaskController::class, 'edit']);
+Route::resource('tasks', TaskController::class);

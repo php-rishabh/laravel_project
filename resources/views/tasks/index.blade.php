@@ -46,16 +46,19 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        tbody {
+            cursor: grab;
+        }
     </style>
 </head>
 <body>
-    <h1>Task Management</h1>
+    <h1>Task List</h1>
 
     <form action="/tasks" method="POST">
         @csrf
         <input type="text" name="title" placeholder="Task Title" required>
         <textarea name="description" placeholder="Task Description"></textarea>
-        <button type="submit">Add Task </button>
+        <button type="submit">Add Management</button>
     </form>
 
     <div class="filter-section">
@@ -76,16 +79,17 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="taskList">
             @foreach($tasks as $task)
-                <tr class="task-row" data-status="{{ $task->completed ? 'completed' : 'not_completed' }}">
+                <tr class="task-row" data-id="{{ $task->id }}" data-status="{{ $task->completed ? 'completed' : 'not_completed' }}">
                     <td>{{ $task->title }}</td>
                     <td>{{ $task->description }}</td>
                     <td>
-                        <form action="/tasks/{{ $task->id }}/toggle" method="POST">
-                            @csrf @method('PATCH')
-                            <input type="checkbox" {{ $task->completed ? 'checked' : '' }} onchange="this.form.submit()">
-                        </form>
+                    <form action="/tasks/{{ $task->id }}/toggle" method="POST" style="display:inline;">
+                    @csrf @method('PATCH')
+                    <input type="checkbox" {{ $task->completed ? 'checked' : '' }} onchange="this.form.submit()">
+                </form>
+
                     </td>
                     <td class="actions">
                         <form action="/tasks/{{ $task->id }}" method="POST">
@@ -101,17 +105,35 @@
         </tbody>
     </table>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
         function filterTasks() {
             let filterValue = document.getElementById("filter").value;
             document.querySelectorAll(".task-row").forEach(row => {
-                if (filterValue === "all" || row.dataset.status === filterValue) {
-                    row.style.display = "table-row";
-                } else {
-                    row.style.display = "none";
-                }
+                row.style.display = (filterValue === "all" || row.dataset.status === filterValue) ? "table-row" : "none";
             });
         }
+
+        new Sortable(document.getElementById("taskList"), {
+            animation: 150,
+            onEnd: function (evt) {
+                let order = [];
+                document.querySelectorAll(".task-row").forEach((row, index) => {
+                    order.push({ id: row.dataset.id, position: index });
+                });
+
+                fetch("/tasks/reorder", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({ order: order })
+                }).then(response => response.json())
+                .then(data => console.log("Reorder success", data))
+                .catch(error => console.error("Reorder error", error));
+            }
+        });
     </script>
 </body>
 </html>
