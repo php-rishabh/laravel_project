@@ -52,13 +52,13 @@
     </style>
 </head>
 <body>
-    <h1>Task List</h1>
+    <h1>Task Management</h1>
 
     <form action="/tasks" method="POST">
         @csrf
         <input type="text" name="title" placeholder="Task Title" required>
         <textarea name="description" placeholder="Task Description"></textarea>
-        <button type="submit">Add Management</button>
+        <button type="submit">Add Task</button>
     </form>
 
     <div class="filter-section">
